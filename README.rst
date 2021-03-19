@@ -15,7 +15,7 @@ What and why
 
 Whilst trying to transition to Signal, group chats between Signal and Whatsapp can become desynchronized, potentially leaving
 Signal users with a negative experience. To overcome that annoyance, this project intends to use
-`signal-cli-rest-api <https://github.com/SebastianLuebke/signal-cli-rest-api.git>`__ and a yet to be determined Whatsapp API to relay messages from specified WhatsApp chats/groups to Signal. (Apparently people have been
+`signal-cli-rest-api <https://github.com/SebastianLuebke/signal-cli-rest-api.git>`__ and a yet to be determined Whatsapp API to relay messages from specified WhatsApp chats/groups to Signal (apparently people have been
 `getting their phone number banned <https://news.ycombinator.com/item?id=18897705>`__ from WhatsApp registering their
 number with APIs like 'yowsup'. See also `these takedowns <https://github.com/github/dmca/blob/332f1896902c4f5780a249c0be5a22b75a4d784e/2014/2014-02-12-WhatsApp.md>`__).
 
