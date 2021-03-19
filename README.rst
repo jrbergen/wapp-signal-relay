@@ -3,7 +3,7 @@ wapp-signal-relay
 =================
 Relays Whatsapp messages to Signal for specified groups and/or contacts.
 
-**.. warning:: Apparently using WhatsApp APIs can get your phone number banned from the service.**
+.. warning:: **Apparently using WhatsApp APIs can get your phone number banned from the service.**
 
 ============
 What and why
