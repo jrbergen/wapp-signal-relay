@@ -1,5 +1,5 @@
 # wapp-signal-relay
-Relays Whatsapp messages to Signal for specified contacts/groups using mainly Python.
+Relays Whatsapp messages to Signal for specified groups and/or contacts.
 
 # What and why
 Whilst trying to transition to Signal, group chats between Signal and Whatsapp can become desynchronized, potentially leaving Signal users with a negative experience. This software will use [*'signal-cli-rest-api'*]( https://github.com/SebastianLuebke/signal-cli-rest-api.git) and [*'yowsup'*](github.com/tgalal/yowsup.git) to relay messages from specified WhatsApp chats/groups to Signal, hopefully ammeliorating that nuisance. 
