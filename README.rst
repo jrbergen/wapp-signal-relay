@@ -7,8 +7,7 @@ Relays Whatsapp messages to Signal for specified groups and/or contacts.
 
 .. warning:: **Apparently using WhatsApp APIs can get your phone number banned from the service.**
  
- People have been `getting their phone numbers banned <https://news.ycombinator.com/item?id=18897705>`__ from WhatsApp registering their
-number with APIs like 'yowsup'. See also `these takedowns <https://github.com/github/dmca/blob/332f1896902c4f5780a249c0be5a22b75a4d784e/2014/2014-02-12-WhatsApp.md>`__).
+ People have been `getting their phone numbers banned <https://news.ycombinator.com/item?id=18897705>`__ from WhatsApp registering their number with APIs like 'yowsup'. See also `these takedowns <https://github.com/github/dmca/blob/332f1896902c4f5780a249c0be5a22b75a4d784e/2014/2014-02-12-WhatsApp.md>`__).
 
 ------------
 
