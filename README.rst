@@ -5,9 +5,9 @@ Relays Whatsapp messages to Signal for specified groups and/or contacts.
 
 ------------
 
-.. warning:: **Apparently using WhatsApp APIs can get your phone number banned from the service.**
+.. warning:: **Apparently using WhatsApp APIs can get your phone number banned from the service. Project is halted until agreement with Whatsapp's terms and conditions is verified.**
  
- People have been `getting their phone numbers banned <https://news.ycombinator.com/item?id=18897705>`__ from WhatsApp registering their number with APIs like 'yowsup'. See also `these takedowns <https://github.com/github/dmca/blob/332f1896902c4f5780a249c0be5a22b75a4d784e/2014/2014-02-12-WhatsApp.md>`__).
+ People have been `getting their phone numbers banned <https://news.ycombinator.com/item?id=18897705>`__ from Whatsapp registering their number with APIs like 'yowsup'. See also `these takedowns <https://github.com/github/dmca/blob/332f1896902c4f5780a249c0be5a22b75a4d784e/2014/2014-02-12-WhatsApp.md>`__).
 
 ------------
 
@@ -22,4 +22,4 @@ Thus, this software is intended to help ease the transition from Whatsapp to Sig
 
 Note: use of separate phone number is advisable
 -----------------------------------------------
-Note that an active phone number is required to register for both Whatsapp and Signal. Furthermore, to the best of my knowledge WhatsApp allows your phone number to be used on a single device only, and using web Whatsapp requires one to be in the same network (please let me know if this is incorrect). Hence, using your current phone number will likely interfere with your daily phone usage. To overcome that, one could for instance register a cellular enabled device - like an old phone - with a prepaid SIM-card, and create a seperate user used to relays group messages.
+Note that an active phone number is required to register for both Whatsapp and Signal. Furthermore, to the best of my knowledge Whatsapp allows your phone number to be used on a single device only, and using web Whatsapp requires one to be in the same local network (please let me know if this is incorrect). Hence, using your current phone number will likely interfere with your daily phone usage. To overcome that, one could for instance register a cellular enabled device - like an old phone - with a prepaid SIM-card, and create a seperate user used to relay group messages.
