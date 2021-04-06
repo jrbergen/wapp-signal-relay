@@ -1,0 +1,143 @@
+import shutil
+import sys
+from pathlib import Path
+import asyncio
+from typing import Optional, Union
+
+from webwhatsapi import WhatsAPIDriver, UserChat
+from config import LogCfg, WSRCfg
+from loggermodule import get_logger
+from src.wapp_signal_relay.io_handling import get_nonexisting_target_path
+
+logger = get_logger(__name__, logcfg=LogCfg())
+
+
+class WSRApplicationSerial:
+
+    DEBUG_ENABLED: bool = True
+
+    def __init__(self, cfg: Optional[WSRCfg] = None):
+
+        self.cfg = WSRCfg() if cfg is None else cfg
+        self.driver: WhatsAPIDriver
+
+    def run(self):
+
+        self.init_whatsapi_driver()
+
+    def init_whatsapi_driver(self):
+
+        self.driver = WhatsAPIDriver(username=self.cfg.USERNAME)
+
+        self.ensure_directory_existence(cfg=self.cfg)
+        self.save_qr(driver=self.driver)
+
+    def save_qr(self, driver: WhatsAPIDriver):
+
+        qr_path_tmp = Path(driver.get_qr()).absolute()
+
+        if qr_path_tmp.exists():
+            self.copy_qr_to_local_dir(qr_src_path=qr_path_tmp)
+
+    def copy_qr_to_local_dir(self, qr_src_path: Union[Path, str]):
+
+        persistent_qr_path: Path = self.cfg.IO.QR_DIR / Path(qr_src_path).name
+        logger.debug('copying temporary QR path: %r to persistent QR path: %r',
+                     qr_src_path, str(persistent_qr_path))
+
+        if qr_src_path.exists():
+            shutil.copy(src=qr_src_path,
+                        dst=get_nonexisting_target_path(persistent_qr_path))
+            logger.debug("QR code copied succesfully.")
+
+        logger.info("Waiting for client to connect using QR code...")
+
+    @staticmethod
+    def ensure_directory_existence(cfg: WSRCfg):
+        for dirname in ('WSR_DIR', 'QR_DIR'):
+            curdir = getattr(cfg.IO, dirname)
+            curdir.mkdir(exist_ok=True, parents=True)
+
+    def __exit__(self):
+        logger.info("Quitting Wapp-Signal-Relay..")
+        sys.exit()
+
+
+class WSRApplicationAsync:
+
+    DEBUG_ENABLED: bool = True
+
+    def __init__(self, cfg: Optional[WSRCfg] = None):
+
+        self.cfg = WSRCfg() if cfg is None else cfg
+        self.driver: WhatsAPIDriver
+        self.eventloop = asyncio.new_event_loop()
+
+        self.eventloop.set_debug(enabled=self.DEBUG_ENABLED)
+
+    def run(self):
+        self.eventloop.run_forever()
+
+        start_driver_task: asyncio.Task = asyncio.create_task(self.init_whatsapi_driver())
+
+    def stop(self):
+        self.eventloop.stop()
+
+    async def init_whatsapi_driver(self):
+
+        driver = WhatsAPIDriver(username=self.cfg.USERNAME)
+
+        self.ensure_directory_existence(cfg=self.cfg)
+        await self.save_qr(driver=driver)
+
+    async def save_qr(self, driver: WhatsAPIDriver):
+
+        qr_path_tmp = driver.get_qr()
+
+        if qr_path_tmp.exists():
+            self.copy_qr_to_local_dir(qr_src_path=qr_path_tmp)
+
+    def copy_qr_to_local_dir(self, qr_src_path: Union[Path, str]):
+
+        persistent_qr_path: Path = self.cfg.IO.QR_DIR / Path(qr_src_path).name
+        logger.debug('copying temporary QR path: %r to persistent QR path: %r',
+                     qr_src_path, str(persistent_qr_path))
+
+        if qr_src_path.exists():
+            shutil.copy(src=qr_src_path,
+                        dst=get_nonexisting_target_path(persistent_qr_path))
+            logger.debug("QR code copied succesful.")
+
+    @staticmethod
+    def ensure_directory_existence(cfg: WSRCfg):
+        for dirname in ('WSR_DIR', 'QR_DIR'):
+            curdir = getattr(cfg.IO, dirname)
+            curdir.mkdir(exist_ok=True, parents=True)
+
+    def __exit__(self):
+        logger.info("Quitting Wapp-Signal-Relay..")
+        self.stop()
+        sys.exit()
+
+
+if __name__ == '__main__':
+    wsr_app = WSRApplicationSerial()
+    wsr_app.run()
+
+    driver = wsr_app.driver
+
+    driver.wait_for_login(timeout=360)
+
+    chats = driver.get_all_chats()
+
+    selected_chat: Optional[UserChat] = None
+    for chat in chats:
+        print(chat.name)
+        if 'Down Syndroom' in chat.name:
+            selected_chat = chat
+            break
+
+    msgs = selected_chat.get_unread_messages()
+    print(msgs)
+    #selected_chat.send_message("TEST")
+
