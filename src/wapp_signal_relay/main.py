@@ -1,23 +1,19 @@
 import shutil
-import sys
-import time
 from pathlib import Path
 import asyncio
 from typing import Optional, Union
-import subprocess
-import aiohttp
-import uvicorn
-import contextlib
+
 import time
-import threading
+
 
 from webwhatsapi import WhatsAPIDriver, UserChat
 from webwhatsapi.objects.message import Message
 from config import LogCfg, WSRCfg
 from loggermodule import get_logger
 from src.wapp_signal_relay.io_handling import get_nonexisting_target_path
-from pydbus import SystemBus
-from gi.repository import GLib
+from dbus_next.aio import MessageBus
+from dbus_next import MessageType, BusType, Message, Variant
+
 
 UVICORN_PORT = 34833
 UVICORN_ADDR = "127.0.0.1"
@@ -113,96 +109,49 @@ def connect_and_get_driver_wapp(login_timeout_qr=180) -> WhatsAPIDriver:
     return driver
 
 
+class SignalClient:
+
+    def __init__(self, eventloop: asyncio.AbstractEventLoop):
+        self.bus = None
+        self.loop = eventloop
+
+    async def start(self):
+        self.bus = await MessageBus(bus_type=BusType.SYSTEM,
+                                    bus_address='org.asamk.signal').connect()
+        #self.signal = self.bus.get('org.asamk.Signal')
+
+    def register(self):
+        pass#regmsg = Message(destination='org.asamk.signal',
+                        # )
+
+    async def send(self):
+        ...#self.signal
 
 
-
-
-def register_signal():
-    pass
-
-    #selected_chat.send_message("TEST")
-
-#def msgRcv (timestamp, source, groupID, message, attachments):
-  # print("Message", message, "received in group", signal.getGroupName (groupID))
-#
-#
-#
-#
-# bus = SystemBus()
-# loop = GLib.MainLoop()
-#
-# signal = bus.get('org.asamk.Signal')
-#
-# signal.onMessageReceived = msgRcv
-# loop.run()
-
-class UviServer(uvicorn.Server):
-
-    def install_signal_handlers(self):
-        pass
-
-    @contextlib.contextmanager
-    def run_in_thread(self):
-        thread = threading.Thread(target=self.run)
-        thread.start()
-        try:
-            while not self.started:
-                time.sleep(1e-3)
-            yield
-        finally:
-            self.should_exit = True
-            thread.join()
-
-
-class SignalUviClient:
-
-    def __init__(self, host: str, port: int, eventloop: asyncio.AbstractEventLoop):
-        self.host = host
-        self.port = port
-        self.eventloop=eventloop
-
-
-    async def register(self, number: str):
-        msg = {"type": "http",
-        "method": "POST",
-        "scheme": "https",
-        "server": (self.host, self.port),
-        "path": f"/register/{number}/link",
-        "headers": [],
-        }
-
-
-async def main(driver: WhatsAPIDriver, event_loop: asyncio.AbstractEventLoop):
-    chat = get_chat(contains='RelayTestWapp', driver=driver)
-    uvi_client = SignalUviClient(host=UVICORN_ADDR, port=UVICORN_PORT, eventloop=eventloop)
+async def main(driver: WhatsAPIDriver, signalclient: SignalClient, event_loop: asyncio.AbstractEventLoop):
+    #chat = get_chat(contains='RelayTestWapp', driver=driver)
+    await signalclient.start()
 
     while True:
-        get_unread = event_loop.create_task(handle_unread(chat))
+        #get_unread = event_loop.create_task(handle_unread(chat))
 
         await asyncio.sleep(2)
-        await asyncio.gather(get_unread)
+        #await asyncio.gather(get_unread)
+
 
 if __name__ == '__main__':
 
+    eventloop = asyncio.get_event_loop()
 
-    logger.info("Starting signal CLI rest API...")
+    logger.info("Starting Signal client")
+    scli = SignalClient(eventloop=eventloop)
 
-    uvi_config = uvicorn.Config("signal_cli_rest_api.main:app", host=UVICORN_ADDR, port=UVICORN_PORT, log_level='info',
-                                loop="asyncio")
-    uvi_server = UviServer(config=uvi_config)
-
-
-    with uvi_server.run_in_thread():
-
-        logger.info("Started signal CLI rest API...")
-        driver = connect_and_get_driver_wapp()
-        eventloop = None
-        try:
-            eventloop = asyncio.get_event_loop()
-
-            eventloop.run_until_complete(main(driver=driver, event_loop=eventloop))
-        except Exception:
-            raise
-        finally:
-            if eventloop:
-                eventloop.close()
+    #driver = connect_and_get_driver_wapp()
+    driver = None
+    try:
+        eventloop.run_until_complete(main(driver=driver, signalclient=scli, event_loop=eventloop))
+    except Exception:
+        raise
+    finally:
+        if eventloop:
+            eventloop.close()
