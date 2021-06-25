@@ -8,22 +8,19 @@ from src.wapp_signal_relay.logutils.logger import errmsg, get_logger
 
 logger = get_logger(__name__)
 
-
 _ACCESS_CHECKS: dict[str, int] = {
-        'w': os.W_OK,
-        'r': os.R_OK,
-        'f': os.F_OK,
-        'x': os.X_OK,
-    }
+    'w': os.W_OK,
+    'r': os.R_OK,
+    'f': os.F_OK,
+    'x': os.X_OK,
+}
 
 
-def pre_launch_checks():
+def pre_launch_checks() -> None:
     check_gitignore()
 
 
-def check_gitignore():
-
-
+def check_gitignore() -> None:
     if not FilePaths.PATH_GITIGNORE.exists():
 
         logger.debug("Did not find .gitignore file: creating one for credentials")
@@ -52,16 +49,16 @@ def check_gitignore():
                          CredentialsFile.CRED_FILENAME, FileNames.GITIGNORE)
 
 
-def check_gitignore_write_permission():
-    FilePaths.check_file_access(FilePaths.PATH_GITIGNORE, 'w',
-                                custom_err=["no permission to write to .gitignore file;",
-                                            "cannot guarantee credentials.py not being uploaded."])
+def check_gitignore_write_permission() -> None:
+    check_file_access(FilePaths.PATH_GITIGNORE, 'w',
+                      custom_err=["no permission to write to .gitignore file;",
+                                  "cannot guarantee credentials.py not being uploaded."])
 
 
-def check_file_access(cls, path: Path, checkstr: str,
+def check_file_access(path: Path, checkstr: str,
                       custom_err: Union[None, str, Iterable[str]] = None) -> None:
     for check in checkstr:
-        if not os.access(path, cls._ACCESS_CHECKS[checkstr]):
+        if not os.access(path, _ACCESS_CHECKS[checkstr]):
             custom_err = custom_err or f"No permission for file operation: {check!r}."
-            raise PermissionError(errmsg(custom_err, cls))
+            raise PermissionError(errmsg(custom_err))
     logger.debug(f"Access checks {', '.join(f'{x!r}' for x in checkstr)} OK.")
