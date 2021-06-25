@@ -11,7 +11,7 @@ class DirNames:
 
 
 class FileNames:
-    CREDENTIALS: str = 'credentials.py'
+    CREDENTIALS: str = 'credentials.yaml'
     GITIGNORE: str = '.gitignore'
     LOGFILE: str = 'wapp-signal-relay-logfile.log'
 
@@ -39,16 +39,17 @@ class CredentialsFile:
     CRED_FILENAME: str = FileNames.CREDENTIALS
 
     LINES: tuple[str, ...] = (
-        "# Ignore credentials.py so it doesn't end up on e.g. github\n",
+        f"# Ignore {FileNames.CREDENTIALS!r} so it doesn't end up on e.g. github\n",
         f"{CRED_FILENAME}\n"
     )
 
 
 class FilePaths:
 
-    PATH_CREDENTIALS = Dirs.DIR_ROOT / FileNames.CREDENTIALS
+
     PATH_GITIGNORE = Dirs.DIR_ROOT / FileNames.GITIGNORE
-    PATH_LOG = Dirs.DIR_ROOT / FileNames.LOGFILE
+    PATH_CREDENTIALS = Dirs.DIR_APPDATA / FileNames.CREDENTIALS
+    PATH_LOG = Dirs.DIR_APPDATA / FileNames.LOGFILE
 
 
 class LogSettings:

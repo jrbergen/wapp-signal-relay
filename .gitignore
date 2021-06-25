@@ -130,3 +130,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+# Ignore 'credentials.yaml' so it doesn't end up on e.g. github
+credentials.yaml
