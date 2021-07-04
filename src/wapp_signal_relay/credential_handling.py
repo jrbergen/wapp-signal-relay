@@ -17,11 +17,20 @@ CRED_KEY: str = 'SIGNAL_ID'
 
 
 def get_signal_id() -> str:
+    """
+    Obtains signal ID (phone number) from credentials file.
+    If the file doesn't exist yet, it is created.
+    """
     ensure_credentials_exist()
     return get_signal_id_or_prompt_new_if_invalid()
 
 
 def get_signal_id_or_prompt_new_if_invalid() -> str:
+    """
+    Tries to load Signal ID (phone number) from the credentials YAML file.
+    If this fails, the user is prompted for a Signal ID which it then returns as a string.
+    """
+
     yaml = YAML(typ='safe')
 
     rewrite_creds = False
@@ -41,6 +50,7 @@ def get_signal_id_or_prompt_new_if_invalid() -> str:
 
 
 def ensure_credentials_exist():
+    """Creates a YAML file to store credentials if this file doesn't exist"""
 
     if not (credpath := FilePaths.PATH_CREDENTIALS).exists():
         yamldict = {CRED_KEY: prompt_signal_id()}
@@ -52,8 +62,10 @@ def ensure_credentials_exist():
 
 
 def prompt_signal_id() -> str:
+    """Prompts the user for a Signal ID (phone number)."""
 
     signal_id_match = False
+    signal_id = 'USER_PROMPT_DID_NOT_RETURN_SIGNAL_ID'
     while not signal_id_match:
         signal_id: str = getpass.getpass(
             prompt="Input Signal ID (=phone number WITH country prefix)")
@@ -64,7 +76,5 @@ def prompt_signal_id() -> str:
             sys.exit(1)
         print("Invalid phone number format. Try again, or type 'exit' to exit program.")
     return signal_id
-
-
 
 
