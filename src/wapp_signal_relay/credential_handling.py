@@ -5,14 +5,13 @@ import sys
 from ruamel.yaml import YAML
 
 from settings import FilePaths
-from checks import check_file_access
-from src.wapp_signal_relay.logutils.logger import errmsg, get_logger
+from src.wapp_signal_relay.logutils.logger import get_logger
 
 logger = get_logger(__name__)
 
 
 # !TODO update phone number regex
-CRED_REX: re.Pattern = re.compile(r''.join(r'[00|+]\d{2}\d{8,12}'))
+CRED_REX: re.Pattern = re.compile(''.join(r'[00|+]\d{2}\d{8,12}'))
 CRED_KEY: str = 'SIGNAL_ID'
 
 
@@ -37,10 +36,13 @@ def get_signal_id_or_prompt_new_if_invalid() -> str:
     with open(credpath := FilePaths.PATH_CREDENTIALS, 'r') as credentialsfile:
         yamldict = yaml.load(credentialsfile)
 
-        if CRED_KEY not in yamldict or not CRED_REX.match(yamldict[CRED_KEY]) in yamldict:
+        if CRED_KEY not in yamldict or not CRED_REX.match(yamldict[CRED_KEY]):
             logger.debug("Invalid or corrupted Signal ID or missing Signal ID key in %r", credpath.name)
             yamldict |= {CRED_KEY: prompt_signal_id()}
             rewrite_creds = True
+        else:
+            partial_sigid_printable = "*" * (len(str(yamldict[CRED_KEY])) - 3) + str(yamldict[CRED_KEY])[-3:]
+            logger.debug("Found Signal ID: %s", partial_sigid_printable)
 
     if rewrite_creds:
         with open(credpath, 'w') as credentialsfile:
@@ -49,7 +51,7 @@ def get_signal_id_or_prompt_new_if_invalid() -> str:
     return yamldict[CRED_KEY]
 
 
-def ensure_credentials_exist():
+def ensure_credentials_exist() -> None:
     """Creates a YAML file to store credentials if this file doesn't exist"""
 
     if not (credpath := FilePaths.PATH_CREDENTIALS).exists():
